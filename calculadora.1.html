@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--CSS externo-->
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.0.4/css/bootstrap-combined.min.css">
+    <!--CSS complementar-->
+    <style>
+       .container {
+            display: flex;			
+	        flex-direction: column;		
+	        align-items: center;
+            margin-top: 1%;
+            background-color: white;
+            width: fit-content;
+            padding: 2em;
+            border-radius: 6px;
+        }
+        .botao{
+            background:linear-gradient(to bottom, rgb(45, 171, 249) 5%, rgb(6, 136, 250) 100%);
+        }
+        .limpar{
+            background:linear-gradient(to bottom, rgb(249, 45, 45) 5%, rgb(250, 5, 5) 100%); 
+        }
+        input[type=button],input[type=reset]{
+            border:1px solid rgb(11, 14, 7);
+            display:inline-block;
+            cursor:pointer;
+            color:#ffffff;
+            font-family:Arial;
+            font-size:15px;
+            padding:9px 23px;
+            box-shadow: 0 1px rgb(60, 60, 60);
+            margin: 3px;
+        } 
+        input[type=button]:active,input[type=reset]:active {
+            box-shadow: 0 0px;
+	        transform: translateY(1px);
+        }
+        body{
+            background-color: rgb(6, 136, 250);
+        }
+    </style>
+    <title>Caluladora de Descontos</title> 
+</head>
+<body>
+    <!--
+        Duas opções de cálculo: Primeira opção calcula valor final 
+        dado um valor inicial e uma porcentagem de desconto; Segunda
+        opção calcula diferença percentual entre dois valores tomando 
+        como base o primeiro valor informado pelo usuário.
+    -->
+    <div class="container">
+        <fieldset>
+            <legend>Calculadora de Descontos</legend>
+            <input type ="button" value ="Calcular Preço" class="botao" onclick="Preco()">
+            <input type ="button" value ="Calcular Porcentagem" class="botao" onclick="Percentual()">
+            <hr>
+        </fieldset>
+        <fieldset>
+            <form>
+                <div id="painel"></div>
+                <hr>
+            </form>
+        </fieldset>
+        <div id="resultado"></div>   
+    </div>
+        
+    <script>
+        // Apresenta o formulário para cálculo da diferença percentual
+        function Percentual(){
+            var painel = window.document.getElementById('painel');
+            painel.innerHTML = `<legend>Porcentagem entre Preços</legend>
+                                <label>Primeiro preço (R$):</label>
+                                <input type="number" id="preco1">
+                                <label>Segundo preço (R$):</label>
+                                <input type="number" id="preco2">
+                                <br>
+                                <input type ="button" value ="Calcular" class="botao" onclick="calculaPercentual()">
+                                <input type ="reset" value="Limpar" class="limpar">`; 
+        }
+        // Calcula diferença percentual entre dois valores
+        function calculaPercentual(){
+			var preco1 = window.document.getElementById('preco1');
+            var preco2 = window.document.getElementById('preco2');
+            var resultado = window.document.getElementById('resultado');
+            var desconto;
+            var dif;
+            preco1 = Number.parseFloat(preco1.value);
+            // Verifica primeiro valor      
+            if(verificaNumero(preco1)){
+                preco2 = Number.parseFloat(preco2.value);
+                // Verifica segundo valor
+                if(verificaNumero(preco2)){
+                    // Se segundo valor maior ou igual ao primeiro
+                    if(preco2 >= preco1){
+                        dif = preco2 - preco1;
+                        desconto = "+" + retornaPercentual(dif,preco1);
+                    }
+                    // Senão
+                    else{
+                        dif = preco1 - preco2;
+                        desconto = "-" + retornaPercentual(dif,preco1);
+                        dif = -dif;
+                    }
+                    // Formata variáveis e apresenta relatório na div resultado
+                    dif = dif.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    preco1 = preco1.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    preco2 = preco2.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    resultado.innerHTML = `<h4># Porcentagem entre Preços #</h4><br>`;
+                    resultado.innerHTML += `<p> Primeiro Preço: ${preco1}</p>`;
+                    resultado.innerHTML += `<p> Segundo Preço: ${preco2}</p>`;
+                    resultado.innerHTML += `<p> Diferença de valor: ${dif}</p>`;
+                    resultado.innerHTML += `<p> Diferença percentual: ${desconto}%</p>`;
+                }
+                else alert("Segundo Preço Inválido!");
+            }
+            else alert("Primeiro Preço Inválido!");
+        }
+        // Retorna diferença percentual aproximada para quatro casa decimais
+        function retornaPercentual(dif,preco1){
+            var desconto =  dif * 100 / preco1;
+            desconto = desconto.toFixed(4);
+            return desconto;
+        }
+        // Apresenta o formulário para cálculo do valor final com desconto
+        function Preco(){
+            var painel = window.document.getElementById('painel');
+            painel.innerHTML = `<legend>Preço Final com Desconto</legend>
+                                <label>Preço Original (R$):</label>
+                                <input type="number" id="valor">
+                                <label>Desconto (%):</label>
+                                <input type="number" id="desconto">
+                                <br>
+                                <input type ="button" value ="Calcular" class="botao" onclick="calculaPreco()">
+                                <input type ="reset" value="Limpar" class="limpar">`;   
+        }
+        // Calcula valor final dado um valor inicial e porcentagem
+        function calculaPreco(){
+            var valor = window.document.getElementById('valor');
+            var desconto = window.document.getElementById('desconto');
+            var resultado = window.document.getElementById('resultado');
+            valor = Number.parseFloat(valor.value);
+            // Verifica valor inicial
+            if(verificaNumero(valor)){
+                desconto = Number.parseFloat(desconto.value);
+                // Verifica porcentagem do desconto, deve ser um número menor que 100 
+                if(verificaNumero(desconto) && desconto < 100){
+                    var valdesc = valor * desconto / 100;
+                    var valfin =  valor - valdesc;
+                    // Formata variáveis e apresenta relatório na div resultado
+                    valor = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    valdesc = valdesc.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    valfin = valfin.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    resultado.innerHTML = `<h4># Preço Final com Desconto #</h4><br>`;
+                    resultado.innerHTML += `<p> Preço original: ${valor}</p>`;
+                    resultado.innerHTML += `<p> Percentual do desconto: ${desconto}%</p>`;
+                    resultado.innerHTML += `<p> Valor do desconto: ${valdesc}</p>`;
+                    resultado.innerHTML += `<p> Preço com desconto: ${valfin}</p>`;
+                }
+                else alert("Desconto Inválido!");
+            }
+            else alert("Preço Inválido!");
+        }
+        // verifica se variável passada por parâmetro é um número maior que zero
+		function verificaNumero(numero){
+			if(!isNaN(numero) && numero > 0){
+				return true;
+			}
+			return false;
+		}
+    </script>
+
+</body>
+</html>
